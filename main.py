@@ -1,7 +1,11 @@
 import customtkinter as ctk
+import numpy as np
+import cv2
 from image_widgets import *
 from PIL import Image, ImageTk, ImageOps, ImageEnhance, ImageFilter
 from menu import Menu
+from rembg import remove
+
 
 class App(ctk.CTk):
     def __init__(self):
@@ -105,6 +109,13 @@ class App(ctk.CTk):
             case 'Find edges': self.image = self.image.filter(ImageFilter.FIND_EDGES)
             case 'Contour': self.image = self.image.filter(ImageFilter.CONTOUR)
             case 'Edge enhance': self.image = self.image.filter(ImageFilter.EDGE_ENHANCE)
+            case 'Denoise': 
+                img = np.array(self.image)
+                img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                dst = cv2.fastNlMeansDenoisingColored(img_bgr, None, 10, 10, 7, 21)
+                dst_rgb = cv2.cvtColor(dst, cv2.COLOR_BGR2RGB)
+                self.image = Image.fromarray(dst_rgb)
+            case 'Remove background': self.image = remove(self.image)
 
         self.place_image()
 
@@ -161,5 +172,3 @@ class App(ctk.CTk):
         print(export_string)
 
 App()
-
-#17h 36'
